@@ -1,0 +1,76 @@
+{
+  "benchmark_name": "UWBench (Underwater Vision-Language Benchmark)",
+  "release_year": 2026,
+  "citation": "Li et al., 'UWBench: A Comprehensive Vision-Language Benchmark for Underwater Understanding', arXiv:2510.18262",
+  "dataset_specifications": {
+    "total_images": 15003,
+    "referring_expressions_grounding": 15281,
+    "question_answer_pairs": 124983,
+    "environments": [
+      "Open Ocean Pelagic",
+      "Tropical Coral Reefs",
+      "Deep-Sea Abyssal Substrate",
+      "Turbid Coastal Estuaries"
+    ]
+  },
+  "comparative_metrics": [
+    {
+      "model": "YOLOv8x + Heuristic NLP",
+      "type": "Cascaded Modular Baseline",
+      "vqa_accuracy": 54.2,
+      "bleu_4": 18.5,
+      "rouge_l": 38.1,
+      "cider": 58.4,
+      "grounding_recall_iou50": 61.2,
+      "turbidity_robustness": "Poor (Fails on high backscatter)"
+    },
+    {
+      "model": "Standard Terrestrial LLaVA-1.5",
+      "type": "General VLM (No Optical Prior)",
+      "vqa_accuracy": 61.7,
+      "bleu_4": 22.3,
+      "rouge_l": 44.6,
+      "cider": 72.0,
+      "grounding_recall_iou50": 64.8,
+      "turbidity_robustness": "Moderate (Color distortion hallucinations)"
+    },
+    {
+      "model": "Qwen2-VL-7B (Zero-Shot)",
+      "type": "General High-Param VLM",
+      "vqa_accuracy": 69.4,
+      "bleu_4": 27.8,
+      "rouge_l": 51.2,
+      "cider": 86.5,
+      "grounding_recall_iou50": 72.3,
+      "turbidity_robustness": "Moderate"
+    },
+    {
+      "model": "AquaSentinel (Ours)",
+      "type": "Integrated Optical Prior + VLM Grounding",
+      "vqa_accuracy": 82.6,
+      "bleu_4": 35.4,
+      "rouge_l": 62.9,
+      "cider": 109.8,
+      "grounding_recall_iou50": 84.1,
+      "turbidity_robustness": "High (Compensated via Beer-Lambert Restoration)"
+    }
+  ],
+  "task_breakdown": {
+    "marine_hazard_detection": {
+      "grounding_accuracy": 86.4,
+      "avg_latency_ms": 142
+    },
+    "coral_health_diagnostics": {
+      "grounding_accuracy": 83.1,
+      "avg_latency_ms": 138
+    },
+    "biodiversity_taxonomy": {
+      "grounding_accuracy": 81.5,
+      "avg_latency_ms": 155
+    },
+    "subsea_infrastructure": {
+      "grounding_accuracy": 84.8,
+      "avg_latency_ms": 140
+    }
+  }
+}

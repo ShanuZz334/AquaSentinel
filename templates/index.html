@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaSentinel | Underwater Vision-Language Analysis System</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="brand-mark">
+                <img src="/static/assets/logo.png" alt="AquaSentinel Logo" class="brand-logo">
+            </div>
+            <div class="brand-text">
+                <h1 class="brand-title">AquaSentinel</h1>
+                <span class="brand-division">Underwater Vision-Language Analysis System</span>
+            </div>
+        </div>
+
+        <nav class="nav-segment">
+            <button class="nav-item active" data-tab="mission-control">Analysis</button>
+            <button class="nav-item" data-tab="optical-lab">Optical Calibration</button>
+            <button class="nav-item" data-tab="benchmarks">Benchmark Validation</button>
+            <button class="nav-item" data-tab="viva-guide">Technical Specifications</button>
+        </nav>
+
+        <div class="header-right">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span class="status-label">Operational • Marine Adapter Active</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace-container">
+
+        <!-- TAB 1: ANALYSIS WORKSPACE -->
+        <section id="mission-control" class="tab-pane active">
+            <div class="workspace-grid">
+                <!-- Left Configuration Column -->
+                <div class="panel config-panel">
+                    <div class="panel-heading">
+                        <h2>Input Configuration</h2>
+                        <span class="panel-sub">Target Image & Objective</span>
+                    </div>
+
+                    <!-- Preset Target Selection -->
+                    <div class="form-group">
+                        <label class="field-label">Curated Benchmark Targets</label>
+                        <div class="target-grid" id="presets-container">
+                            <div class="target-card active" data-filename="ghost_net_reef.jpg" data-prompt="Identify objects that could be harmful to marine life and ocean fauna.">
+                                <img src="/api/samples/ghost_net_reef.jpg" alt="Ghost Net">
+                                <div class="target-details">
+                                    <span class="target-name">Ghost Net Hazard</span>
+                                    <span class="target-env">Coral Reef (12m)</span>
+                                </div>
+                            </div>
+                            <div class="target-card" data-filename="sunken_drum_debris.jpg" data-prompt="Perform an anomaly scan and detect anthropogenic waste or hazard containers.">
+                                <img src="/api/samples/sunken_drum_debris.jpg" alt="Chemical Drum">
+                                <div class="target-details">
+                                    <span class="target-name">Industrial Container</span>
+                                    <span class="target-env">Benthic Sediment (35m)</span>
+                                </div>
+                            </div>
+                            <div class="target-card" data-filename="coral_bleaching_reef.jpg" data-prompt="Assess coral reef health and identify signs of bleaching or degraded substrate.">
+                                <img src="/api/samples/coral_bleaching_reef.jpg" alt="Bleached Coral">
+                                <div class="target-details">
+                                    <span class="target-name">Bleached Substrate</span>
+                                    <span class="target-env">Shallow Atoll (6m)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Option -->
+                    <div class="form-group">
+                        <label class="field-label">Custom Image Ingestion</label>
+                        <div class="upload-zone" id="dropzone">
+                            <input type="file" id="image-upload" accept="image/*" class="file-input">
+                            <i class="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
+                            <p class="upload-hint">Upload underwater imagery or <strong>Browse</strong></p>
+                            <span class="upload-filename" id="file-status">Standard target active</span>
+                        </div>
+                    </div>
+
+                    <!-- Directive Input -->
+                    <div class="form-group">
+                        <label class="field-label" for="mission-prompt">Analysis Directive / Query</label>
+                        <textarea id="mission-prompt" rows="3" class="text-area" spellcheck="false">Identify objects that could be harmful to marine life.</textarea>
+                        
+                        <!-- Quick Directive Selectors -->
+                        <div class="directive-selectors">
+                            <button type="button" class="query-pill" data-text="Identify objects that could be harmful to marine life.">Hazard Identification</button>
+                            <button type="button" class="query-pill" data-text="Describe the important objects in this image and assess ecological condition.">Scene Inventory</button>
+                            <button type="button" class="query-pill" data-text="Assess coral reef health, bleaching percentage, and benthic substrate.">Benthic Assessment</button>
+                            <button type="button" class="query-pill" data-text="Conduct a marine biodiversity survey and identify pelagic teleosts.">Fauna Survey</button>
+                        </div>
+                    </div>
+
+                    <!-- Calibration Option -->
+                    <div class="form-group-checkbox">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="enhancement-toggle" checked>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">Optical attenuation correction (Beer-Lambert model)</span>
+                        </label>
+                    </div>
+
+                    <!-- Action Trigger -->
+                    <button id="run-mission-btn" class="primary-button">
+                        <i class="fa-solid fa-play"></i> Run Analysis
+                    </button>
+                </div>
+
+                <!-- Right Results Column -->
+                <div class="panel results-panel">
+                    <!-- Image Viewport -->
+                    <div class="viewport-card">
+                        <div class="viewport-toolbar">
+                            <div class="segmented-control">
+                                <button class="control-btn active" data-view="grounded">Annotated Overlay</button>
+                                <button class="control-btn" data-view="enhanced">Color Corrected</button>
+                                <button class="control-btn" data-view="heatmap">Hazard Heatmap</button>
+                                <button class="control-btn" data-view="raw">Original Image</button>
+                            </div>
+                            <div class="correction-indicator" id="optical-cast-badge">
+                                Spectral Attenuation Restored: <strong id="cast-pct">41.2%</strong>
+                            </div>
+                        </div>
+
+                        <div class="image-stage">
+                            <div id="loader" class="loader-overlay hidden">
+                                <div class="spinner"></div>
+                                <span class="spinner-text">Processing spatial features and linguistic alignment...</span>
+                            </div>
+                            <img id="display-image" src="/api/samples/ghost_net_reef.jpg" alt="Analyzed Target">
+                        </div>
+                    </div>
+
+                    <!-- Analytical Summary Section -->
+                    <div class="analysis-summary">
+                        <div class="summary-header">
+                            <div class="status-block">
+                                <span class="indicator-tag" id="report-threat-status">STANDBY</span>
+                            </div>
+                            <div class="severity-block">
+                                <span class="metric-title">Severity Rating:</span>
+                                <span class="metric-score" id="hazard-score">-- / 10.0</span>
+                            </div>
+                            <div class="export-block">
+                                <a id="dossier-download-link" href="#" target="_blank" class="secondary-button" style="text-decoration: none; padding: 0.35rem 0.75rem; font-size: 0.75rem; display: none; align-items: center;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export Inspection Dossier
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Generated Diagnostic Narrative -->
+                        <div class="summary-body">
+                            <h3 class="section-title">Executive Scene Assessment</h3>
+                            <div class="narrative-box" id="report-narrative">
+                                Select a target and click "Run Analysis" to initiate multimodal evaluation.
+                            </div>
+                        </div>
+
+                        <!-- Grounded Entities Table -->
+                        <div class="entities-section">
+                            <h3 class="section-title">Identified Entities & Spatial Localization</h3>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Identifier</th>
+                                            <th>Entity Name</th>
+                                            <th>Spatial Region</th>
+                                            <th>Confidence</th>
+                                            <th>Classification Tier</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="entities-tbody">
+                                        <tr>
+                                            <td colspan="5" class="empty-state">No active analysis loaded.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Action Protocol -->
+                        <div class="action-callout">
+                            <div class="callout-heading">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                                <h4>Recommended Operational Protocol</h4>
+                            </div>
+                            <p id="protocol-text">Awaiting directive execution.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: OPTICAL CALIBRATION LAB -->
+        <section id="optical-lab" class="tab-pane">
+            <div class="panel lab-panel">
+                <div class="panel-heading">
+                    <h2>Physics-Based Optical Calibration</h2>
+                    <p class="panel-sub">
+                        Mathematical compensation for spectral attenuation in marine aquatic medium using the Beer-Lambert formulation: 
+                        <code>I(λ, d) = I₀(λ) · exp(-β(λ) · d)</code>
+                    </p>
+                </div>
+
+                <div class="lab-layout">
+                    <div class="lab-form">
+                        <h3 class="subsection-title">Calibration Parameters</h3>
+                        <div class="control-row">
+                            <div class="label-wrapper">
+                                <span>Red Wavelength Recovery Gain</span>
+                                <strong id="val-red">1.35x</strong>
+                            </div>
+                            <input type="range" id="slider-red" min="1.0" max="2.0" step="0.05" value="1.35" class="slider-control">
+                        </div>
+
+                        <div class="control-row">
+                            <div class="label-wrapper">
+                                <span>Luminance Contrast Factor</span>
+                                <strong id="val-contrast">1.25x</strong>
+                            </div>
+                            <input type="range" id="slider-contrast" min="1.0" max="2.0" step="0.05" value="1.25" class="slider-control">
+                        </div>
+
+                        <div class="control-row">
+                            <div class="label-wrapper">
+                                <span>Blue/Cyan Attenuation Damping</span>
+                                <strong id="val-blue">0.92x</strong>
+                            </div>
+                            <input type="range" id="slider-blue" min="0.75" max="1.0" step="0.01" value="0.92" class="slider-control">
+                        </div>
+
+                        <button id="tune-optical-btn" class="secondary-button">
+                            Apply Calibration Updates
+                        </button>
+                    </div>
+
+                    <div class="lab-viewport">
+                        <h3 class="subsection-title">Calibrated Preview</h3>
+                        <div class="preview-frame">
+                            <img id="lab-preview-img" src="/api/samples/ghost_net_reef.jpg" alt="Calibrated Preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: BENCHMARK VALIDATION -->
+        <section id="benchmarks" class="tab-pane">
+            <div class="panel benchmark-panel">
+                <div class="panel-heading">
+                    <h2>UWBench (2026) Comparative Validation</h2>
+                    <p class="panel-sub">
+                        Quantitative validation against marine domain benchmarks comprising 15,003 images and 124,983 multi-modal question-answer evaluations across varied aquatic ecosystems.
+                    </p>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-wrapper">
+                        <h3 class="subsection-title">VQA Top-1 Accuracy (%)</h3>
+                        <canvas id="chart-accuracy"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h3 class="subsection-title">Language Generation Quality (CIDEr & BLEU-4)</h3>
+                        <canvas id="chart-metrics"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <h3 class="subsection-title">Comparative Performance Matrix</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Architecture</th>
+                                    <th>VQA Accuracy</th>
+                                    <th>BLEU-4</th>
+                                    <th>ROUGE-L</th>
+                                    <th>CIDEr</th>
+                                    <th>Grounding Recall (IoU@0.5)</th>
+                                    <th>Domain Robustness</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bench-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: TECHNICAL SPECIFICATIONS -->
+        <section id="viva-guide" class="tab-pane">
+            <div class="panel docs-panel">
+                <div class="panel-heading">
+                    <h2>Technical Specifications & Methodology</h2>
+                    <p class="panel-sub">Formal documentation of the Computer Vision pipeline and Natural Language Processing architecture.</p>
+                </div>
+
+                <div class="methodology-card">
+                    <h3 class="subsection-title">System Pipeline Topology</h3>
+                    <div class="topology-grid">
+                        <div class="topology-box">
+                            <span class="box-step">Stage 1</span>
+                            <h4>Optical Physics Correction</h4>
+                            <p>Compensates for wavelength-dependent attenuation (Beer-Lambert law) and applies adaptive histogram equalization to recover contrast lost to backscattering.</p>
+                        </div>
+                        <div class="topology-box">
+                            <span class="box-step">Stage 2</span>
+                            <h4>Spatial Feature Grounding</h4>
+                            <p>Open-vocabulary Vision Transformer (ViT) projects regional patch tokens to detect spatial coordinates and bounding anchors across marine substrates.</p>
+                        </div>
+                        <div class="topology-box">
+                            <span class="box-step">Stage 3</span>
+                            <h4>Linguistic Reasoning</h4>
+                            <p>Autoregressive Language Model conditions on detected coordinates and user directives to synthesize structured situational analyses and risk indices.</p>
+                        </div>
+                        <div class="topology-box">
+                            <span class="box-step">Stage 4</span>
+                            <h4>Operational Dispatch</h4>
+                            <p>Outputs formatted telemetry, severity ratings, and actionable navigational protocols for underwater exploration units.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h3 class="subsection-title">Technical Review & Defense Points</h3>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <h4>How does the system distinguish Computer Vision from Natural Language Processing?</h4>
+                            <p>Computer Vision is responsible for optical attenuation compensation, image tensor normalization, and visual feature extraction via Vision Transformers to output pixel bounding coordinates. Natural Language Processing parses open-vocabulary mission directives and performs autoregressive linguistic decoding to generate structured ecological assessments.</p>
+                        </div>
+                        <div class="faq-item">
+                            <h4>Why do terrestrial vision-language models degrade in underwater environments?</h4>
+                            <p>Terrestrial models are trained predominantly on natural light scenes where red, green, and blue wavelengths travel uniformly. In water, selective red-light absorption, backscattering, and suspended particulate degrade contrast, causing standard terrestrial models to misclassify benthic substrate or miss hazards.</p>
+                        </div>
+                        <div class="faq-item">
+                            <h4>What distinguishes this from traditional bounding-box detectors (e.g., YOLO)?</h4>
+                            <p>Traditional object detectors are restricted to a closed class taxonomy. They cannot interpret complex conversational questions, determine whether an object constitutes an entanglement risk, or evaluate ecological consequences. AquaSentinel provides open-vocabulary grounding combined with contextual reasoning.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+        <p>AquaSentinel • Underwater Vision-Language Analysis System • Academic AI Research Capstone</p>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
